@@ -1,4 +1,4 @@
-name: RAITE_env
+name: nd-blueteam-2
 channels:
   - defaults
 dependencies:
