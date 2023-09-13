@@ -57,6 +57,7 @@ dependencies = [
     "tzdata==2023.3",
     "urllib3==1.26.15",
     "opencv-python>=4.8.0.76",
+    "pyyaml>=6.0.1",
 ]
 requires-python = ">=3.10,<3.11"
 readme = "README.md"
