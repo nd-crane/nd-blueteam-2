@@ -1,10 +1,7 @@
-from typing import Any
 import cv2
 import argparse
 import os
-import datetime
 import time
-import numpy as np
 import torch
 import torchvision.io
 import torchvision.models as models
@@ -22,27 +19,6 @@ def write_to_csv(frame_number, boxes, scores, csv_path, score_threshold=0.0):
                 line = f"{frame_number},[{x1},{vx},{y1},{vy}];{score:.3f}\n"
                 csvfile.write(line)
 
-
-def make_prediction2(image_array, model, device):
-    # Define the image transformation to be applied to the input NumPy array
-    transform = transforms.Compose([
-        transforms.ToPILImage(),  # Convert to PIL image
-        transforms.ToTensor(),    # Convert to a PyTorch tensor
-        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
-
-    # Apply the transformation to the input NumPy array
-    image = transform(image_array).to(device)
-
-    # Add a batch dimension (assuming model expects a batch of images)
-    image = torch.unsqueeze(image, dim=0)
-
-    # Make predictions
-    predictions = model(image)
-    boxes = predictions[0]['boxes'].detach().cpu().numpy()
-    scores = predictions[0]['scores'].detach().cpu().numpy() 
-
-    return boxes, scores
 
 class prediction_helper():
     def __init__(self):
@@ -74,15 +50,6 @@ class prediction_helper():
         scores = scores.detach().cpu().numpy()
 
         return boxes, scores
-
-
-def impath_make_prediction(image_path, model, device):
-    
-    image = torch.unsqueeze(torchvision.io.read_image(image_path).to(torch.float32)/255., dim=0).to(device)
-    predictions = model(image)       
-    boxes = predictions[0]['boxes'].detach().cpu().numpy()
-    scores = predictions[0]['scores'].detach().cpu().numpy() 
-    return boxes, scores
 
 def draw_boxes(image, boxes, scores, score_threshold=0.0):
     # Iterate over each box and draw it on the image
@@ -133,8 +100,6 @@ def main():
     model.load_state_dict(torch.load(weights_path)['state_dict'])
     model = model.to(device)
     model.eval()
-    
-    boxes, scores =  impath_make_prediction("sample_img.png", model, device)
     
     # NEW CODE BY TIM
     predictor = prediction_helper()
